@@ -19,20 +19,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
-#include "../inc/MarlinConfig.h"
+#ifdef __IMXRT1062__
+  #include <NativeEthernet.h>
+#endif
 
-#if ENABLED(MK2_MULTIPLEXER)
+// Teensy 4.1 uses internal MAC Address
 
-#include "../module/stepper.h"
+class MarlinEthernet {
+  public:
+    static bool hardware_enabled, have_telnet_client;
+    static IPAddress ip, myDns, gateway, subnet;
+    static EthernetClient telnetClient;
+    static void init();
+    static void check();
+};
 
-void select_multiplexed_stepper(const uint8_t e) {
-  planner.synchronize();
-  disable_e_steppers();
-  WRITE(E_MUX0_PIN, TEST(e, 0) ? HIGH : LOW);
-  WRITE(E_MUX1_PIN, TEST(e, 1) ? HIGH : LOW);
-  WRITE(E_MUX2_PIN, TEST(e, 2) ? HIGH : LOW);
-  safe_delay(100);
-}
-
-#endif // MK2_MULTIPLEXER
+extern MarlinEthernet ethernet;
